@@ -4,6 +4,13 @@ export type RoomCategoryResponseType = {
   data: IRoomCategory[];
 };
 
+export type ErrorResponseType = {
+  code: string;
+  message: string;
+  reason: string;
+  error: { key: string; message: string }[];
+};
+
 export type IRoomCategory = {
   id: string;
   name: string;

@@ -1,39 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
-import { type RoomCategoryResponseType } from "~/types/api.types";
+import { fetchRoomCategory } from "~/app/api/room";
+import { RoomCategoryResponseType } from "~/types/api.types";
 import { DateValueType } from "~/types/common.types";
 import { formatDateToString } from "~/utils/formatDateToString";
 
-const fetchRoomCategory = async (
-  startDate: string,
-  endDate: string
-): Promise<RoomCategoryResponseType[]> => {
-  const response = await fetch(
-    `https://api.bytebeds.com/api/v1/property/1/room/rate-calendar/assessment?start_date=${startDate}&end_date=${endDate}`
-  );
-
-  if (!response.ok) {
-    throw new Error("Server Error");
-  }
-
-  const data = await response.json();
-  return data;
-};
-
 export const useRoomCategory = (
-  startDate: DateValueType,
-  endDate: DateValueType
+  unFormattedStartDate: DateValueType,
+  unFormattedEndDate: DateValueType,
+  enabled: boolean = true
 ) => {
-  const formattedStartDate = startDate
-    ? formatDateToString(startDate)
+  const startDate = unFormattedStartDate
+    ? formatDateToString(unFormattedStartDate)
     : undefined;
-  const formattedEndDate = endDate ? formatDateToString(endDate) : undefined;
+  const endDate = unFormattedEndDate
+    ? formatDateToString(unFormattedEndDate)
+    : undefined;
 
-  const queryEnabled = formattedStartDate && formattedEndDate;
+  const { isLoading, isError, error, data } =
+    useQuery<RoomCategoryResponseType>({
+      queryKey: ["rate-calendar", startDate, endDate],
+      queryFn: () => fetchRoomCategory(startDate, endDate),
+      enabled: enabled,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      staleTime: 6000, // 1 minute
+    });
 
-  return useQuery({
-    queryKey: ["rate-calendar", startDate, endDate],
-    queryFn: queryEnabled
-      ? () => fetchRoomCategory(formattedStartDate, formattedEndDate)
-      : undefined,
-  });
+  return {
+    isLoading,
+    isError,
+    error,
+    data,
+  };
 };
