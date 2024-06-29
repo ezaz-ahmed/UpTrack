@@ -3,11 +3,16 @@
 import { useState } from "react";
 import Container from "@mui/material/Container";
 import Snackbar from "@mui/material/Snackbar";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
 import Header from "~/components/ui/Header";
 import { useRoomCategory } from "~/hooks/useRoomCategory";
 import { DateRangeType, DateValueType } from "~/types/common.types";
+import RoomCategorySection from "~/components/ui/RoomCategorySection";
+import RateCalendar from "~/components/ui/RateCalendar";
 
 const startDate = new Date("2024-06-23");
 const endDate = new Date("2024-08-23");
@@ -50,9 +55,52 @@ function Home() {
 
   return (
     <Container maxWidth="xl">
-      <Header dateValues={value} onChange={onChange} />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          marginTop: 3,
+          marginBottom: 9,
+          gap: 6,
+        }}
+      >
+        <Header dateValues={value} onChange={onChange} />
 
-      {isLoading && <CircularProgress />}
+        <Card
+          sx={{
+            height: "100%",
+            minHeight: 300,
+          }}
+        >
+          {isLoading ? (
+            <Box
+              sx={{
+                height: "100%",
+                minHeight: 300,
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress />
+              <Typography variant="body1">Fetching data</Typography>
+            </Box>
+          ) : (
+            <Box>
+              {/* {data && data.data ? (
+                <RoomCategorySection roomData={data.data} />
+              ) : (
+                <Alert severity="info">No Data to show</Alert>
+              )} */}
+
+              <RateCalendar />
+            </Box>
+          )}
+        </Card>
+      </Box>
 
       <Snackbar open={isError} autoHideDuration={6000} onClose={handleClose}>
         <Alert
